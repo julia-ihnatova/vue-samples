@@ -4,29 +4,33 @@
             Search <input name="query" v-model="searchQuery">
         </form>
         <div id="grid-template">
-            <table>
-                <thead>
-                <tr>
+            <div class="table-header-wrapper">
+                <table class="table-header">
+                    <thead>
                     <th v-for="key in columns"
                         @click="sortBy(key)"
-                        :class="{ active: sortKey == key }">
+                        :class="{ active: sortKey == key }"
+                    >
                         {{ key | capitalize }}
                         <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
                     </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="entry in dataPerPage">
-                    <td v-for="key in columns">
-                        {{entry[key]}}
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    </thead>
+                </table>
+            </div>
+            <div class="table-body-wrapper">
+                <table class="table-body">
+                    <tbody>
+                        <tr v-for="entry in dataPerPage">
+                            <td v-for="key in columns"> {{entry[key]}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div id="page-navigation">
                 <button @click=movePages(-1)>Back</button>
                 <p>{{startRow / rowsPerPage + 1}} out of {{Math.ceil(filteredData.length / rowsPerPage)}}</p>
                 <button @click=movePages(1)>Next</button>
+
                 <select v-model="rowsPerPage">
                     <option v-for="pageSize in pageSizeMenu" :value="pageSize">{{pageSize}}</option>
                 </select>
@@ -49,8 +53,8 @@
                 sortKey: '',
                 sortOrders: {},
                 startRow: 0,
+                rowsPerPage: 10,
                 pageSizeMenu: [10, 20, 50, 100],
-                rowsPerPage: 10
 
             }
         },
@@ -60,9 +64,7 @@
                 let filterKey = this.searchQuery && this.searchQuery.toLowerCase()
                 let order = this.sortOrders[sortKey] || 1
                 let data = this.data
-
                 this.startRow = 0 // reset to start
-
                 if (filterKey) {
                     data = data.filter(function (row) {
                         return Object.keys(row).some(function (key) {
@@ -118,9 +120,9 @@
     }
 
     table {
-        border: 2px solid #42b983;
-        border-radius: 3px;
-        background-color: #fff;
+        border-spacing: 0;
+        width: 100%;
+
     }
 
     th {
@@ -134,11 +136,11 @@
     }
 
     td {
-        background-color: #f9f9f9;
+       border-bottom: 1px #4AAE9B solid;
     }
 
     th, td {
-        min-width: 120px;
+        min-width: 150px;
         padding: 10px 20px;
     }
 
@@ -171,31 +173,27 @@
         border-top: 4px solid #fff;
     }
 
-    #grid-template{
-
+    .wrapper{
+        height: 300px;
     }
 
-    table{
-        display: table;
-    }
-
-
-    thead
-    {
-        display: block;
-        overflow: auto;
-    }
-
-
-    #grid-template tbody{
-        display: block;
-        height: 200px;
-        overflow: auto;
-    }
-
-    #grid-template tr{
+    #grid-template > .table-body-wrapper {
         width: 100%;
-        display: table;
+        overflow-y: scroll;
+    }
+
+    #grid-template {
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: column;
+        -webkit-flex-direction: column;
+        height: 100%;
+        width: 600px;
+    }
+    #grid-template > .table-header-wrapper { }
+    #grid-template > .table-body-wrapper {
+        flex: 1;
+        -webkit-flex: 1;
     }
 
     #page-navigation {
@@ -213,4 +211,6 @@
         border-color: #42b983;
         color: rgba(255, 255, 255, 0.66);
     }
+
+
 </style>
